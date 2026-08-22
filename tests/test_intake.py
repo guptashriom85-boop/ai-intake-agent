@@ -1,40 +1,33 @@
+import os
+os.environ["DATABASE_URL"]="sqlite:///./test_intake.db"
+os.environ["ADMIN_EMAIL"]="admin@test.com"
+os.environ["ADMIN_PASSWORD"]="secret"
+os.environ["JWT_SECRET"]="test-secret-key-32-characters-long"
 from fastapi.testclient import TestClient
 from app.main import app
 
-client = TestClient(app)
-
-
 def test_health():
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    with TestClient(app) as c: assert c.get('/health').json()['status']=='ok'
 
+def test_clinic_emergency():
+    with TestClient(app) as c:
+        r=c.post('/api/intake',json={"mode":"clinic","name":"Test User","contact":"a@b.com","message":"I have chest pain and can't breathe"})
+        assert r.status_code==200; d=r.json(); assert d['risk']=='critical'; assert d['urgency']=='emergency'; assert d['handoff_requested']==1
 
-def test_clinic_normal_intake():
-    response = client.post("/api/intake", json={"domain":"clinic","message":"I have had a cough for three days and want an appointment."})
-    assert response.status_code == 200
-    data = response.json()
-    assert data["domain"] == "clinic"
-    assert data["escalation_required"] is False
-    assert data["risk_level"] == "medium"
+def test_legal_intake():
+    with TestClient(app) as c:
+        r=c.post('/api/intake',json={"mode":"legal","name":"Test User","contact":"999","message":"I received a lawsuit"})
+        assert r.status_code==200; assert r.json()['risk']=='high'
 
+def test_appointment():
+    with TestClient(app) as c:
+        r=c.post('/api/appointments',json={"mode":"clinic","name":"Test","contact":"999","preferred_slot":"Tomorrow 10 AM","notes":"follow-up"})
+        assert r.status_code==200; assert r.json()['status']=='requested'
 
-def test_clinic_emergency_escalation():
-    response = client.post("/api/intake", json={"domain":"clinic","message":"I have severe chest pain and cannot breathe."})
-    assert response.status_code == 200
-    data = response.json()
-    assert data["risk_level"] == "emergency"
-    assert data["escalation_required"] is True
+def test_admin_stats_requires_auth():
+    with TestClient(app) as c: assert c.get('/api/admin/stats').status_code==401
 
-
-def test_legal_urgent():
-    response = client.post("/api/intake", json={"domain":"legal","message":"I have a court hearing today and need help with my case."})
-    assert response.status_code == 200
-    data = response.json()
-    assert data["risk_level"] == "high"
-    assert data["escalation_required"] is True
-
-
-def test_rejects_empty_message():
-    response = client.post("/api/intake", json={"domain":"clinic","message":""})
-    assert response.status_code == 422
+def test_admin_login_and_stats():
+    with TestClient(app) as c:
+        token=c.post('/auth/login',json={"email":"admin@test.com","password":"secret"}).json()['access_token']
+        assert c.get('/api/admin/stats',headers={'Authorization':f'Bearer {token}'}).status_code==200
