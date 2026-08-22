@@ -1,137 +1,69 @@
-# AI Clinic / Legal Intake Agent
+# AI Intake Agent
 
-An AI-powered intake and routing service for clinics and legal practices.
+**Clinic + Legal Intake Automation MVP** — capture a request, triage urgency, persist the case, request appointments, and hand off high-risk cases to a human professional.
 
-It turns an unstructured user message into:
+> Safety: this is an intake/routing product, not a medical diagnostic system or legal advice service. Do not use it as a substitute for emergency services or qualified professionals.
 
-- urgency / risk level
-- escalation decision
-- concise summary
-- structured intake fields
-- missing information
-- next questions
-- a safe user-facing response
+## What is included
 
-The project is designed as a portfolio-quality reference implementation, not as a production medical or legal decision system.
-
-## Architecture
-
-```text
-Browser / CRM / WhatsApp / Website
-              |
-              v
-        FastAPI /api/intake
-              |
-       +------+------+
-       |             |
-       v             v
-  Safety rules    Intake field detection
-       |             |
-       +------+------+
-              v
-        OpenAI Responses API
-          (optional)
-              |
-              v
-     Structured IntakeResult
-```
-
-## Features
-
-### Clinic mode
-Collects common intake details such as symptoms, duration, severity, medications/allergies and appointment preference.
-
-### Legal mode
-Collects legal issue, jurisdiction, deadlines, documents and desired outcome.
-
-### Safety layer
-Urgent patterns are detected before normal intake. Clinic emergencies are routed toward urgent in-person/emergency care; legal high-risk situations are routed toward qualified local legal or emergency support.
-
-### No API key required for demo
-Without `OPENAI_API_KEY`, the project uses a deterministic fallback so the repository still works locally and in tests.
+- Clinic and legal modes
+- Deterministic critical/high/routine triage
+- Automatic human-handoff flag for urgent cases
+- SQLite persistence (PostgreSQL-ready via `DATABASE_URL`)
+- Appointment request workflow
+- JWT-protected admin endpoints
+- Admin statistics + case lists
+- Optional OpenAI enrichment (kept optional so the core app works without an API key)
+- Browser UI
+- Dockerfile
+- GitHub Actions CI
+- Swagger/OpenAPI at `/docs`
 
 ## Run locally
 
 ```bash
-git clone https://github.com/guptashriom85-boop/ai-intake-agent.git
-cd ai-intake-agent
 python -m venv .venv
 # Windows: .venv\\Scripts\\activate
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env   # Windows
-# cp .env.example .env  # macOS/Linux
+copy .env.example .env       # Windows
+# cp .env.example .env       # macOS/Linux
 uvicorn app.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000` for the demo UI.
+Open `http://127.0.0.1:8000`.
 
-API docs: `http://127.0.0.1:8000/docs`
+Default admin credentials come from `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). **Change them before deployment.**
 
-## Add AI
+## Optional AI mode
 
-Put your API key in `.env`:
-
-```env
-OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-5.6
-```
-
-The app will automatically switch from the local fallback to the OpenAI Responses API.
-
-## Example request
+Install the SDK and set your key:
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/intake \
-  -H "Content-Type: application/json" \
-  -d '{"domain":"clinic","message":"I have fever for two days and need an appointment tomorrow."}'
+pip install "openai>=1.99,<2"
 ```
 
-## Example response shape
+Then set `OPENAI_API_KEY` and `OPENAI_MODEL`. If unavailable or if the call fails, the system safely falls back to deterministic intake messaging.
 
-```json
-{
-  "session_id": "...",
-  "domain": "clinic",
-  "reply": "...",
-  "summary": "...",
-  "risk_level": "medium",
-  "escalation_required": false,
-  "collected_fields": {},
-  "missing_fields": [],
-  "next_questions": [],
-  "disclaimer": "...",
-  "ai_used": true
-}
-```
+## API
 
-## Tests
-
-```bash
-pytest -q
-```
+- `POST /api/intake` — create and triage an intake
+- `POST /api/appointments` — request an appointment
+- `POST /api/intake/{id}/handoff` — force human escalation (admin)
+- `GET /api/admin/intakes` — list intakes (admin)
+- `GET /api/admin/appointments` — list appointment requests (admin)
+- `GET /api/admin/stats` — dashboard stats (admin)
+- `POST /auth/login` — obtain JWT
+- `GET /health` — health check
+- `GET /docs` — interactive Swagger UI
 
 ## Docker
 
 ```bash
 docker build -t ai-intake-agent .
-docker run --rm -p 8000:8000 --env-file .env ai-intake-agent
+docker run -p 8000:8000 --env-file .env ai-intake-agent
 ```
 
-## Production hardening roadmap
+## Production checklist
 
-1. Add authentication and tenant-level API keys.
-2. Replace in-memory processing with Postgres + encrypted secrets.
-3. Add consent capture and audit logging.
-4. Add human handoff integrations (email, CRM, Slack, WhatsApp, scheduling).
-5. Add stricter jurisdiction-specific legal rules and clinician-approved triage rules.
-6. Add rate limiting, PII redaction, retention policies and observability.
-7. Add signed webhooks and idempotency keys.
-
-## Safety / compliance note
-
-This repository is an intake and routing demo. It must not be used as an autonomous medical diagnosis system or as a substitute for legal counsel. Before production use, the deployment should undergo professional review, privacy/security review, and jurisdiction-specific compliance review.
-
-## License
-
-MIT
+Before handling real patient/client information: use PostgreSQL, HTTPS, a proper identity provider, encrypted secret storage, rate limiting, audit logs, consent/privacy controls, region-specific emergency escalation, backups, monitoring, and a real case-management dashboard. Review applicable healthcare/legal privacy and professional regulations for your deployment region.
