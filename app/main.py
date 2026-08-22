@@ -21,6 +21,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request): return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/admin", response_class=HTMLResponse)
+def admin_page(request: Request): return templates.TemplateResponse("admin.html", {"request": request})
 @app.get("/health")
 def health(): return {"status":"ok","version":"2.0.0"}
 
