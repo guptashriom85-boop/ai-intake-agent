@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Intake Agent</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">AI WORKFLOW DEMO</p>
+        <h1>Clinic / Legal Intake Agent</h1>
+        <p class="sub">Collect → assess urgency → summarize → route to a human professional.</p>
+      </div>
+      <span id="status" class="status">Ready</span>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <label>Mode
+          <select id="domain">
+            <option value="clinic">Clinic</option>
+            <option value="legal">Legal</option>
+          </select>
+        </label>
+        <button id="clear" class="ghost">Clear</button>
+      </div>
+      <label for="message">Describe the situation</label>
+      <textarea id="message" rows="7" placeholder="Example: I have had a fever for two days and want an appointment tomorrow."></textarea>
+      <button id="send">Start intake</button>
+    </section>
+
+    <section id="result" class="result hidden">
+      <div class="grid">
+        <div class="card"><h3>Assistant</h3><p id="reply"></p></div>
+        <div class="card"><h3>Risk</h3><p id="risk"></p><span id="escalation"></span></div>
+      </div>
+      <div class="card"><h3>Summary</h3><p id="summary"></p></div>
+      <div class="card"><h3>Collected</h3><pre id="fields"></pre></div>
+      <div class="card"><h3>Next questions</h3><ul id="questions"></ul></div>
+      <p id="disclaimer" class="disclaimer"></p>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
