@@ -1,39 +1,4 @@
-const $ = (id) => document.getElementById(id);
-
-async function runIntake() {
-  const message = $("message").value.trim();
-  if (!message) return;
-  $("status").textContent = "Processing...";
-  $("send").disabled = true;
-  try {
-    const response = await fetch("/api/intake", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ domain: $("domain").value, message })
-    });
-    if (!response.ok) throw new Error(await response.text());
-    const data = await response.json();
-    $("result").classList.remove("hidden");
-    $("reply").textContent = data.reply;
-    $("risk").textContent = data.risk_level.toUpperCase();
-    $("risk").className = `risk-${data.risk_level}`;
-    $("escalation").textContent = data.escalation_required ? "Escalation required" : "Routine intake";
-    $("summary").textContent = data.summary;
-    $("fields").textContent = JSON.stringify(data.collected_fields, null, 2);
-    $("questions").innerHTML = data.next_questions.map(q => `<li>${q}</li>`).join("") || "<li>No more questions needed.</li>";
-    $("disclaimer").textContent = data.disclaimer;
-    $("status").textContent = data.ai_used ? "AI + rules" : "Rules fallback";
-  } catch (error) {
-    $("status").textContent = "Error";
-    alert("Request failed: " + error.message);
-  } finally {
-    $("send").disabled = false;
-  }
-}
-
-$("send").addEventListener("click", runIntake);
-$("clear").addEventListener("click", () => {
-  $("message").value = "";
-  $("result").classList.add("hidden");
-  $("status").textContent = "Ready";
-});
+let mode='clinic';
+document.querySelectorAll('.mode button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.mode button').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode});
+document.getElementById('intake').onsubmit=async e=>{e.preventDefault();const r=await fetch('/api/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode,name:name.value,contact:contact.value,message:message.value})});const d=await r.json();document.getElementById('result').innerHTML=r.ok?`<div class="alert"><b>Status:</b> ${d.status}<br><b>Risk:</b> ${d.risk}<br><b>Urgency:</b> ${d.urgency}<br>${d.summary}</div>`:`Error: ${d.detail||'Unable to submit'}`};
+document.getElementById('appointment').onsubmit=async e=>{e.preventDefault();const r=await fetch('/api/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode,name:aname.value,contact:acontact.value,preferred_slot:slot.value,notes:notes.value})});const d=await r.json();document.getElementById('apptResult').textContent=r.ok?`Appointment request #${d.id} submitted.`:`Error: ${d.detail||'Unable to submit'}`};
