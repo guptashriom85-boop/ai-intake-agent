@@ -1,1 +1,116 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Intake Agent</title><link rel="stylesheet" href="/static/style.css"></head><body><main class="wrap"><section class="hero"><p class="eyebrow">AI INTAKE AGENT v2</p><h1>Clinic & Legal Intake</h1><p>Capture a new intake, detect urgency, and route high-risk cases to a human professional.</p></section><section class="card"><div class="mode"><button class="active" data-mode="clinic">Clinic</button><button data-mode="legal">Legal</button></div><form id="intake"><input id="name" required placeholder="Full name"><input id="contact" required placeholder="Phone or email"><textarea id="message" required placeholder="Describe what you need help with..."></textarea><button class="primary">Submit intake</button></form><div id="result"></div></section><section class="card"><h2>Request an appointment</h2><form id="appointment"><input id="aname" required placeholder="Full name"><input id="acontact" required placeholder="Phone or email"><input id="slot" required placeholder="Preferred day/time"><textarea id="notes" placeholder="Notes (optional)"></textarea><button class="primary">Request appointment</button></form><div id="apptResult"></div></section></main><script src="/static/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Intake Agent</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="Workspace">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div>
+          <h1>AI Intake Agent</h1>
+          <p class="muted">Voice-first clinic and legal intake</p>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="label">Mode</div>
+        <div class="segment mode" role="tablist" aria-label="Intake mode">
+          <button class="active" data-mode="clinic" type="button">Clinic</button>
+          <button data-mode="legal" type="button">Legal</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="label">System</div>
+        <div class="metric"><span>API</span><strong id="apiStatus">Checking</strong></div>
+        <div class="metric"><span>Voice</span><strong id="voiceStatus">Checking</strong></div>
+        <div class="metric"><span>Handoff</span><strong>Auto</strong></div>
+      </section>
+
+      <section class="panel safety-panel">
+        <div class="label">Guardrail</div>
+        <p>This product captures and routes intake details. It does not diagnose, give legal advice, or replace emergency services.</p>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="tag" id="modeLabel">Clinic assistant</p>
+          <h2>Talk to the virtual intake assistant.</h2>
+        </div>
+        <div class="actions">
+          <a class="button" href="/admin">Admin</a>
+          <a class="button" href="/docs">API Docs</a>
+        </div>
+      </header>
+
+      <div class="main-grid">
+        <section class="card assistant-card" aria-label="Virtual assistant">
+          <div class="section-head">
+            <div>
+              <div class="label">Live Assistant</div>
+              <h3 id="assistantTitle">Patient intake</h3>
+            </div>
+            <span class="status-pill">Human review ready</span>
+          </div>
+
+          <div class="assistant-chat" id="assistantChat" aria-live="polite"></div>
+
+          <form id="intake" class="assistant-form">
+            <div class="identity-grid">
+              <label>Full name<input id="name" required minlength="2" maxlength="120" placeholder="Jane Smith"></label>
+              <label>Phone or email<input id="contact" required minlength="3" maxlength="160" placeholder="jane@example.com"></label>
+            </div>
+            <label>Message<textarea id="message" required minlength="3" maxlength="5000" rows="5" placeholder="Describe the issue, symptoms, timeline, deadline, or help needed..."></textarea></label>
+            <div class="example-row" aria-label="Examples">
+              <button type="button" data-example="I have high fever and severe pain since yesterday. I need a doctor appointment today.">Clinic urgent</button>
+              <button type="button" data-example="I received an eviction notice and the deadline is tomorrow. I need legal help urgently.">Legal urgent</button>
+              <button type="button" data-example="I want a routine consultation next week and can share my documents before the call.">Routine</button>
+            </div>
+            <div class="composer-row">
+              <button class="icon-button" id="voiceButton" type="button" title="Voice input" aria-label="Voice input">Mic</button>
+              <label class="switch"><input id="speakToggle" type="checkbox" checked> Voice reply</label>
+              <button class="button primary" id="submitIntake" type="submit">Send</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="summary-column" aria-label="Summary">
+          <section class="card priority-card" id="priorityCard">
+            <div class="label">Triage Result</div>
+            <div class="priority-value" id="riskValue">Waiting</div>
+            <p id="riskReason">Submit an intake to generate routing guidance.</p>
+          </section>
+
+          <section class="card result-card">
+            <div class="section-head compact-head">
+              <div class="label">Structured Output</div>
+              <button class="text-button" id="copyResult" type="button">Copy</button>
+            </div>
+            <div id="result" class="empty-state">No intake submitted yet.</div>
+          </section>
+
+          <section class="card">
+            <div class="label">Appointment</div>
+            <form id="appointment" class="stacked-form">
+              <input id="aname" required placeholder="Full name">
+              <input id="acontact" required placeholder="Phone or email">
+              <input id="slot" required placeholder="Preferred day/time">
+              <textarea id="notes" rows="4" placeholder="Notes"></textarea>
+              <button class="button secondary" type="submit">Request appointment</button>
+            </form>
+            <div id="apptResult" class="mini-result"></div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
