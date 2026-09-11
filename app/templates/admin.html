@@ -1,1 +1,52 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin — AI Intake Agent</title><link rel="stylesheet" href="/static/style.css"></head><body><main class="wrap"><section class="hero"><p class="eyebrow">ADMIN CONSOLE</p><h1>Intake Dashboard</h1><p>Review cases and appointment requests. Use professional human review for every escalated case.</p></section><section class="card"><form id="login"><input id="email" type="email" placeholder="Admin email" required><input id="password" type="password" placeholder="Password" required><button class="primary">Sign in</button></form><div id="loginResult"></div></section><section class="card" id="dashboard" hidden><div id="stats"></div><h2>Recent Intakes</h2><div id="intakes"></div><h2>Appointments</h2><div id="appointments"></div></section></main><script src="/static/admin.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - AI Intake Agent</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-hero">
+      <div>
+        <p class="tag">Admin console</p>
+        <h2>Intake dashboard</h2>
+        <p class="muted">Review triage, handoff flags, and appointment requests.</p>
+      </div>
+      <div class="actions">
+        <a class="button" href="/">Assistant</a>
+        <a class="button" href="/docs">API Docs</a>
+      </div>
+    </header>
+
+    <div class="admin-grid">
+      <section class="card">
+        <div class="label">Sign In</div>
+        <form id="login" class="stacked-form">
+          <input id="email" type="email" placeholder="Admin email" required>
+          <input id="password" type="password" placeholder="Password" required>
+          <button class="button primary" type="submit">Sign in</button>
+        </form>
+        <div id="loginResult" class="mini-result"></div>
+      </section>
+
+      <section class="card" id="dashboard" hidden>
+        <div class="section-head compact-head">
+          <div>
+            <div class="label">Operations</div>
+            <h3>Review queue</h3>
+          </div>
+          <button class="text-button" id="refresh" type="button">Refresh</button>
+        </div>
+        <div id="stats" class="stat-grid"></div>
+        <div class="section-head compact-head"><div class="label">Recent Intakes</div></div>
+        <div id="intakes" class="record-list"></div>
+        <div class="section-head compact-head section-gap"><div class="label">Appointments</div></div>
+        <div id="appointments" class="record-list"></div>
+      </section>
+    </div>
+  </main>
+  <script src="/static/admin.js"></script>
+</body>
+</html>
