@@ -3,130 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Intake Agent - Static Demo</title>
+  <title>AI Intake Agent - Voice Demo</title>
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #eef2f1;
-      --surface: #ffffff;
-      --surface-soft: #f7f9f8;
-      --ink: #16201d;
-      --muted: #65736f;
-      --line: #dbe3e0;
-      --teal: #19756b;
-      --teal-dark: #105b54;
-      --blue: #365f9f;
-      --amber: #b97818;
-      --red: #d45c45;
-      --shadow: 0 16px 42px rgba(31, 46, 43, 0.12);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    button, input, textarea, select { font: inherit; }
-    button { cursor: pointer; }
-    .app-shell { display: grid; grid-template-columns: 310px minmax(0, 1fr); min-height: 100vh; }
-    .sidebar { display: flex; flex-direction: column; gap: 16px; padding: 22px; background: #f9fbfa; border-right: 1px solid var(--line); }
-    .brand { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; min-width: 0; }
-    .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 8px; background: var(--teal); color: #fff; font-weight: 900; }
-    h1, h2, h3, p { margin: 0; }
-    h1 { font-size: 18px; line-height: 1.2; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .panel, .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-    .panel { padding: 14px; }
-    .label { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
-    .segment { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; padding: 4px; border-radius: 8px; background: var(--surface-soft); border: 1px solid var(--line); }
-    .segment button { min-height: 38px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-weight: 800; }
-    .segment button.active { background: var(--teal); color: #fff; }
-    .metric { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; color: var(--muted); font-size: 14px; }
-    .metric strong { color: var(--ink); font-size: 18px; }
-    .saved-list { display: grid; gap: 8px; margin-top: 12px; }
-    .saved-item { width: 100%; min-height: 56px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); text-align: left; }
-    .saved-item strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .saved-item span { color: var(--muted); font-size: 12px; }
-    .workspace { min-width: 0; padding: 22px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
-    .tag { color: var(--teal); font-size: 13px; font-weight: 900; text-transform: uppercase; }
-    h2 { margin-top: 4px; font-size: 34px; line-height: 1.05; }
-    .actions { display: flex; gap: 10px; }
-    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-weight: 850; text-decoration: none; }
-    .button.primary { border-color: var(--teal); background: var(--teal); color: #fff; }
-    .main-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 18px; align-items: start; }
-    .chat-card { display: grid; grid-template-rows: minmax(430px, calc(100vh - 190px)) auto; overflow: hidden; box-shadow: var(--shadow); }
-    .conversation { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 18px; background: var(--surface-soft); }
-    .message { max-width: 86%; padding: 12px 14px; border-radius: 8px; line-height: 1.45; box-shadow: 0 8px 18px rgba(31, 46, 43, 0.08); }
-    .message.agent { align-self: flex-start; background: #fff; border: 1px solid var(--line); }
-    .message.user { align-self: flex-end; background: var(--teal); color: #fff; }
-    .message.system { align-self: center; max-width: 100%; background: #fff7ed; border: 1px solid #f1d6ad; color: #6f4d19; box-shadow: none; font-size: 13px; }
-    .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .quick-reply { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--teal-dark); font-weight: 800; }
-    .composer { display: grid; grid-template-columns: 1fr 52px; gap: 10px; padding: 12px; border-top: 1px solid var(--line); background: #fff; }
-    .composer input { min-width: 0; height: 46px; border: 1px solid var(--line); border-radius: 8px; padding: 0 13px; color: var(--ink); outline: none; }
-    .composer input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(25, 117, 107, 0.13); }
-    .send { width: 52px; min-height: 46px; border: 0; border-radius: 8px; background: var(--teal); color: #fff; font-weight: 900; }
-    .summary { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-    .card { padding: 15px; }
-    .priority { border-left: 6px solid var(--blue); }
-    .priority.medium { border-left-color: var(--amber); }
-    .priority.high { border-left-color: var(--red); }
-    .priority-value { margin-top: 8px; font-size: 30px; font-weight: 900; line-height: 1; }
-    .priority p { margin-top: 8px; color: var(--muted); line-height: 1.4; }
-    .summary-list { display: grid; gap: 10px; margin-top: 12px; }
-    .summary-row { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 10px; }
-    .summary-row b { color: var(--muted); font-size: 13px; }
-    .summary-row span { overflow-wrap: anywhere; }
-    .checklist { display: grid; gap: 9px; margin: 12px 0 0; padding: 0; list-style: none; }
-    .checklist li { display: grid; grid-template-columns: 20px 1fr; gap: 8px; color: var(--muted); line-height: 1.35; }
-    .checklist li:before { content: ""; width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--teal); }
-    .export-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-    @media (max-width: 1040px) { .app-shell, .main-grid { grid-template-columns: 1fr; } .sidebar { border-right: 0; border-bottom: 1px solid var(--line); } .chat-card { grid-template-rows: minmax(420px, 58vh) auto; } }
-    @media (max-width: 680px) { .sidebar, .workspace { padding: 14px; } .topbar { align-items: stretch; flex-direction: column; } h2 { font-size: 28px; } .actions, .export-row { display: grid; grid-template-columns: 1fr 1fr; } .message { max-width: 94%; } .summary-row { grid-template-columns: 1fr; gap: 3px; } }
+    :root{color-scheme:light;--bg:#eef2f1;--surface:#fff;--soft:#f7f9f8;--ink:#16201d;--muted:#65736f;--line:#dbe3e0;--teal:#19756b;--teal-dark:#105b54;--blue:#365f9f;--amber:#b97818;--red:#d45c45;--shadow:0 18px 48px rgba(31,46,43,.12)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}h1,h2,h3,p{margin:0}.muted{color:var(--muted);font-size:13px;line-height:1.45}.app{display:grid;grid-template-columns:310px minmax(0,1fr);min-height:100vh}.side{display:flex;flex-direction:column;gap:16px;padding:22px;background:#f9fbfa;border-right:1px solid var(--line)}.brand{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center}.mark{display:grid;place-items:center;width:48px;height:48px;border-radius:8px;background:var(--teal);color:#fff;font-weight:950}h1{font-size:18px}.panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}.panel{padding:14px}.label{color:var(--muted);font-size:12px;font-weight:850;letter-spacing:0;text-transform:uppercase}.segment{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:10px;padding:4px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}.segment button{min-height:38px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-weight:850}.segment button.active{background:var(--teal);color:#fff}.metric{display:flex;justify-content:space-between;gap:12px;padding-top:12px;color:var(--muted);font-size:14px}.metric strong{color:var(--ink);font-size:16px}.work{padding:22px;min-width:0}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}.tag{color:var(--teal);font-size:13px;font-weight:900;text-transform:uppercase}h2{margin-top:4px;max-width:720px;font-size:clamp(28px,4vw,46px);line-height:1.03}.actions{display:flex;gap:10px;flex-wrap:wrap}.button,.chip,.icon{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-weight:850;text-decoration:none}.button{min-height:42px;padding:0 14px;border:1px solid var(--line);background:#fff;color:var(--ink)}.button.primary{border-color:var(--teal);background:var(--teal);color:#fff}.grid{display:grid;grid-template-columns:minmax(0,1fr)390px;gap:18px;align-items:start}.card{padding:16px}.assistant{display:grid;grid-template-rows:auto minmax(330px,calc(100vh - 430px)) auto;gap:14px;min-height:calc(100vh - 136px);box-shadow:var(--shadow)}.head{display:flex;align-items:center;justify-content:space-between;gap:14px}.pill{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#eaf6f4;color:var(--teal-dark);font-size:12px;font-weight:850;white-space:nowrap}.chat{display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}.bubble{max-width:86%;padding:12px 14px;border-radius:8px;line-height:1.45;box-shadow:0 8px 18px rgba(31,46,43,.08)}.bubble.assistant{align-self:flex-start;background:#fff;border:1px solid var(--line)}.bubble.user{align-self:flex-end;background:var(--teal);color:#fff}.form{display:grid;gap:12px}.identity{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:grid;gap:7px;color:var(--muted);font-size:13px;font-weight:800}input,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);outline:none}input{height:42px;padding:0 12px}textarea{padding:11px 12px;resize:vertical;line-height:1.45}input:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(25,117,107,.13)}.examples{display:flex;flex-wrap:wrap;gap:8px}.chip{min-height:34px;padding:0 10px;border:1px solid var(--line);background:#fff;color:var(--teal-dark)}.composer{display:grid;grid-template-columns:auto 1fr 120px;gap:10px;align-items:center}.icon{min-width:58px;min-height:42px;border:1px solid var(--line);background:#fff;color:var(--teal-dark)}.icon.recording{border-color:var(--red);background:#fff1ee;color:var(--red)}.switch{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}.switch input{width:16px;height:16px}.summary{display:flex;flex-direction:column;gap:14px}.priority{border-left:6px solid var(--blue)}.priority.medium{border-left-color:var(--amber)}.priority.high{border-left-color:var(--red)}.pv{margin-top:8px;font-size:31px;font-weight:950;line-height:1}.priority p{margin-top:8px;color:var(--muted);line-height:1.4}.rows{display:grid;gap:10px;margin-top:12px}.row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}.row b{color:var(--muted);font-size:13px}.row span{overflow-wrap:anywhere}.list{display:grid;gap:9px;margin:12px 0 0;padding:0;list-style:none}.list li{display:grid;grid-template-columns:20px 1fr;gap:8px;color:var(--muted);line-height:1.35}.list li:before{content:"";width:18px;height:18px;border-radius:5px;border:2px solid var(--teal)}.export{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}@media(max-width:1080px){.app,.grid{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.assistant{min-height:auto;grid-template-rows:auto minmax(360px,52vh) auto}}@media(max-width:700px){.side,.work{padding:14px}.top,.head{align-items:stretch;flex-direction:column}.identity,.composer,.row,.export{grid-template-columns:1fr}.actions{display:grid;grid-template-columns:1fr 1fr}.bubble{max-width:94%}.button,.icon{width:100%}}
   </style>
 </head>
 <body>
-  <main class="app-shell">
-    <aside class="sidebar" aria-label="Workspace">
-      <div class="brand"><div class="brand-mark">AI</div><div><h1>AI Intake Agent</h1><p class="muted">Clinic and legal intake triage</p></div></div>
-      <section class="panel"><div class="label">Mode</div><div class="segment"><button class="active" data-mode="clinic">Clinic</button><button data-mode="legal">Legal</button></div></section>
-      <section class="panel"><div class="label">Queue</div><div class="metric"><span>Saved intakes</span><strong id="savedCount">0</strong></div><div class="metric"><span>High priority</span><strong id="urgentCount">0</strong></div><div class="metric"><span>Demo status</span><strong>Ready</strong></div></section>
-      <section class="panel"><div class="label">Saved Intakes</div><div class="saved-list" id="savedList"></div></section>
-    </aside>
-    <section class="workspace">
-      <header class="topbar"><div><p class="tag" id="modeLabel">Clinic intake</p><h2 id="screenTitle">New patient intake</h2></div><div class="actions"><button class="button" id="newIntake">New</button><button class="button primary" id="saveCase">Save</button></div></header>
-      <div class="main-grid">
-        <section class="card chat-card" aria-label="Intake chat"><div class="conversation" id="conversation"></div><form class="composer" id="composer"><input id="answerInput" autocomplete="off" placeholder="Type answer..."><button class="send" type="submit">Go</button></form></section>
-        <aside class="summary" aria-label="Summary">
-          <section class="card priority" id="priorityCard"><div class="label">Priority</div><div class="priority-value" id="priorityValue">Routine</div><p id="priorityReason">Waiting for intake answers.</p></section>
-          <section class="card"><div class="label">Structured Summary</div><div class="summary-list" id="summaryList"></div></section>
-          <section class="card"><div class="label">Follow Up</div><ul class="checklist" id="followUpList"></ul></section>
-          <section class="card"><div class="label">Export</div><div class="export-row"><button class="button" id="downloadJson">JSON</button><button class="button" id="downloadTxt">TXT</button></div></section>
-        </aside>
-      </div>
-    </section>
-  </main>
+<main class="app">
+  <aside class="side">
+    <div class="brand"><div class="mark">AI</div><div><h1>AI Intake Agent</h1><p class="muted">Real-time virtual assistant demo</p></div></div>
+    <section class="panel"><div class="label">Mode</div><div class="segment" id="modeTabs"><button class="active" data-mode="clinic">Clinic</button><button data-mode="legal">Legal</button></div></section>
+    <section class="panel"><div class="label">Status</div><div class="metric"><span>Voice input</span><strong id="voiceStatus">Checking</strong></div><div class="metric"><span>Voice reply</span><strong>On</strong></div><div class="metric"><span>Static demo</span><strong>Ready</strong></div></section>
+    <section class="panel"><div class="label">Guardrail</div><p class="muted" style="margin-top:9px">Demo for intake routing only. It is not medical advice, legal advice, or emergency support.</p></section>
+  </aside>
+  <section class="work">
+    <header class="top"><div><p class="tag" id="modeLabel">Clinic assistant</p><h2>Talk to the virtual intake assistant.</h2></div><div class="actions"><a class="button" href="./README.md">README</a><a class="button" href="https://github.com/guptashriom85-boop/ai-intake-agent">GitHub</a></div></header>
+    <div class="grid">
+      <section class="card assistant"><div class="head"><div><div class="label">Live Assistant</div><h3 id="assistantTitle">Patient intake</h3></div><span class="pill">Browser voice ready</span></div><div class="chat" id="chat"></div><form class="form" id="form"><div class="identity"><label>Full name<input id="name" required placeholder="Jane Smith"></label><label>Phone or email<input id="contact" required placeholder="jane@example.com"></label></div><label>Message<textarea id="message" rows="5" required placeholder="Describe symptoms, deadline, issue, or appointment need..."></textarea></label><div class="examples"><button class="chip" type="button" data-example="I have high fever and severe pain since yesterday. I need a doctor appointment today.">Clinic urgent</button><button class="chip" type="button" data-example="I received an eviction notice and the deadline is tomorrow. I need legal help urgently.">Legal urgent</button><button class="chip" type="button" data-example="I want a routine consultation next week and can share documents before the call.">Routine</button></div><div class="composer"><button class="icon" id="mic" type="button">Mic</button><label class="switch"><input id="speak" type="checkbox" checked> Voice reply</label><button class="button primary" type="submit">Send</button></div></form></section>
+      <aside class="summary"><section class="card priority" id="priority"><div class="label">Triage</div><div class="pv" id="risk">Routine</div><p id="reason">Waiting for intake details.</p></section><section class="card"><div class="label">Structured Summary</div><div class="rows" id="rows"></div></section><section class="card"><div class="label">Follow Up</div><ul class="list" id="follow"></ul></section><section class="card"><div class="label">Export</div><div class="export"><button class="button" id="json" type="button">JSON</button><button class="button" id="txt" type="button">TXT</button></div></section></aside>
+    </div>
+  </section>
+</main>
 <script>
-const flows={clinic:{label:"Clinic intake",title:"New patient intake",intro:"Hello. I will collect patient details and prepare a front-desk summary.",fields:[["name","Name","What is the patient's full name?"],["age","Age","What is the patient's age?"],["contact","Contact","What phone number or email should the clinic use?"],["concern","Concern","What is the main health concern or appointment reason?"],["duration","Duration","When did this start?",["Today","This week","1-4 weeks","More than a month"]],["symptoms","Symptoms","Any symptoms, medications, allergies, or relevant history?"],["availability","Availability","What appointment time works best?",["Morning","Afternoon","Evening","Any time"]]],follow:["Confirm contact details before booking.","Request insurance or payment information.","Ask patient to bring medication list and prior reports.","Route urgent symptoms to clinical staff immediately."],high:["chest pain","cannot breathe","can't breathe","severe bleeding","stroke","unconscious","suicide","overdose"],medium:["high fever","difficulty breathing","severe pain","fainted","infection","injury"]},legal:{label:"Legal intake",title:"New client intake",intro:"Hello. I will collect matter details and prepare an attorney review summary.",fields:[["name","Name","What is the client's full name?"],["contact","Contact","What phone number or email should the firm use?"],["matter","Matter","What type of legal matter is this?",["Family","Immigration","Contract","Property","Employment"]],["party","Other Party","Who is the opposing party or related organization, if any?"],["deadline","Deadline","Is there a court date, filing deadline, notice date, or urgent timeline?"],["summary","Summary","Briefly describe what happened."],["documents","Documents","What documents are available?",["Contract","Notice","Court papers","Emails","None yet"]]],follow:["Run conflict check before consultation.","Collect government ID and key documents.","Confirm jurisdiction and deadline dates.","Route urgent court dates to an attorney immediately."],high:["court today","court tomorrow","deadline today","deadline tomorrow","eviction","arrest","served","deported"],medium:["court","deadline","notice","summons","lawsuit","termination"]}};
-const state={mode:"clinic",step:0,answers:{},messages:[],saved:JSON.parse(localStorage.getItem("ai-intake-agent-demo")||"[]")};
-const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
-function flow(){return flows[state.mode]}function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
-function start(){state.step=0;state.answers={};state.messages=[["system","Static portfolio demo. Do not use for medical or legal advice."],["agent",flow().intro]];ask();render()}
-function ask(){const field=flow().fields[state.step];state.messages.push(field?["agent",field[2],field[3]||[]]:["agent","Intake complete. The summary, priority, and follow-up list are ready."])}
-function send(value){const text=value.trim();const field=flow().fields[state.step];if(!text||!field)return;state.messages.push(["user",text]);state.answers[field[0]]=text;state.step+=1;ask();render()}
-function priority(){const text=Object.values(state.answers).join(" ").toLowerCase();const high=flow().high.find(k=>text.includes(k));const medium=flow().medium.find(k=>text.includes(k));if(high)return{level:"High",className:"high",reason:`Flagged because the intake mentions "${high}".`};if(medium)return{level:"Medium",className:"medium",reason:`Review soon because the intake mentions "${medium}".`};return{level:"Routine",className:"",reason:Object.keys(state.answers).length?"No urgent terms detected in the current intake.":"Waiting for intake answers."}}
-function rows(){return flow().fields.map(f=>({label:f[1],value:state.answers[f[0]]||"Pending"}))}
-function render(){renderHeader();renderMessages();renderSummary();renderSaved()}
-function renderHeader(){$("#modeLabel").textContent=flow().label;$("#screenTitle").textContent=flow().title;$$(".segment button").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.mode))}
-function renderMessages(){const box=$("#conversation");box.innerHTML="";state.messages.forEach((message,index)=>{const el=document.createElement("div");el.className=`message ${message[0]}`;el.textContent=message[1];if(message[2]?.length&&index===state.messages.length-1){const replies=document.createElement("div");replies.className="quick-replies";message[2].forEach(reply=>{const b=document.createElement("button");b.type="button";b.className="quick-reply";b.textContent=reply;b.onclick=()=>send(reply);replies.append(b)});el.append(replies)}box.append(el)});box.scrollTop=box.scrollHeight}
-function renderSummary(){const p=priority();$("#priorityCard").className=`card priority ${p.className}`.trim();$("#priorityValue").textContent=p.level;$("#priorityReason").textContent=p.reason;$("#summaryList").innerHTML=rows().map(r=>`<div class="summary-row"><b>${esc(r.label)}</b><span>${esc(r.value)}</span></div>`).join("");$("#followUpList").innerHTML=flow().follow.map(item=>`<li>${esc(item)}</li>`).join("")}
-function renderSaved(){$("#savedCount").textContent=state.saved.length;$("#urgentCount").textContent=state.saved.filter(item=>item.priority==="High").length;$("#savedList").innerHTML=state.saved.length?state.saved.slice(0,7).map(item=>`<button class="saved-item"><strong>${esc(item.name||"Unnamed intake")}</strong><span>${esc(item.mode)} | ${esc(item.priority)}</span></button>`).join(""):`<div class="saved-item"><strong>No saved intakes</strong><span>Saved cases will appear here.</span></div>`}
-function payload(){const p=priority();return{product:"AI Intake Agent",mode:flow().label,priority:p.level,priorityReason:p.reason,summary:Object.fromEntries(rows().map(r=>[r.label,r.value])),followUp:flow().follow,createdAt:new Date().toISOString()}}
-function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-$("#composer").addEventListener("submit",e=>{e.preventDefault();send($("#answerInput").value);$("#answerInput").value=""});$$(".segment button").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;start()});$("#newIntake").onclick=start;$("#saveCase").onclick=()=>{if(!Object.keys(state.answers).length){alert("Add intake answers before saving.");return}const p=priority();state.saved.unshift({name:state.answers.name,mode:flow().label,priority:p.level,answers:{...state.answers}});localStorage.setItem("ai-intake-agent-demo",JSON.stringify(state.saved));renderSaved()};$("#downloadJson").onclick=()=>download("intake-summary.json",JSON.stringify(payload(),null,2),"application/json");$("#downloadTxt").onclick=()=>download("intake-summary.txt",JSON.stringify(payload(),null,2),"text/plain");start();
+const flows={clinic:{label:'Clinic assistant',title:'Patient intake',hello:'Hello. Tell me what is happening and I will prepare a triage summary for human review.',fields:['name','contact','message'],follow:['Confirm contact details before booking.','Request insurance or payment information.','Ask patient to bring medication list and reports.','Escalate urgent symptoms to clinical staff immediately.'],high:['chest pain','cannot breathe',"can't breathe",'severe bleeding','stroke','unconscious','overdose'],medium:['high fever','severe pain','difficulty breathing','infection','injury']},legal:{label:'Legal assistant',title:'Client intake',hello:'Hello. Tell me about the matter, deadline, and documents. I will prepare a routing summary for attorney review.',fields:['name','contact','message'],follow:['Run a conflict check before consultation.','Collect ID and key documents.','Confirm jurisdiction and deadline dates.','Escalate urgent court dates to an attorney immediately.'],high:['court today','court tomorrow','deadline today','deadline tomorrow','eviction','arrest','served','deported'],medium:['court','deadline','notice','summons','lawsuit','termination']}};
+let mode='clinic',last={};const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],Rec=window.SpeechRecognition||window.webkitSpeechRecognition,rec=Rec?new Rec():null;
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}function flow(){return flows[mode]}function bubble(t,x){const b=document.createElement('div');b.className='bubble '+t;b.textContent=x;$('#chat').append(b);$('#chat').scrollTop=$('#chat').scrollHeight;return b}function speak(x){if(!$('#speak').checked||!speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.lang='en-IN';u.rate=.95;speechSynthesis.speak(u)}
+function priority(){const text=($('#message').value+' '+(last.message||'')).toLowerCase(),h=flow().high.find(k=>text.includes(k)),m=flow().medium.find(k=>text.includes(k));if(h)return{level:'High',cls:'high',reason:'Urgent phrase detected: '+h};if(m)return{level:'Medium',cls:'medium',reason:'Review soon because intake mentions: '+m};return{level:'Routine',cls:'',reason:'No urgent terms detected in the current intake.'}}
+function summary(){return{name:$('#name').value||'Pending',contact:$('#contact').value||'Pending',message:last.message||$('#message').value||'Pending',mode:flow().label,priority:priority().level,createdAt:new Date().toISOString()}}function render(){const p=priority(),s=summary();$('#priority').className='card priority '+p.cls;$('#risk').textContent=p.level;$('#reason').textContent=p.reason;$('#rows').innerHTML=`<div class="row"><b>Name</b><span>${esc(s.name)}</span></div><div class="row"><b>Contact</b><span>${esc(s.contact)}</span></div><div class="row"><b>Mode</b><span>${esc(s.mode)}</span></div><div class="row"><b>Message</b><span>${esc(s.message)}</span></div>`;$('#follow').innerHTML=flow().follow.map(x=>`<li>${esc(x)}</li>`).join('')}
+function reply(){const p=priority();return p.level==='High'?'This looks urgent. I have flagged it for immediate human review. Please contact local emergency services for danger or emergency symptoms.':p.level==='Medium'?'I captured this as medium priority. A professional should review it soon and confirm the next step.':'I captured this as routine priority. The summary is ready for review and appointment scheduling.'}
+function setMode(m){mode=m;$$('#modeTabs button').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));$('#modeLabel').textContent=flow().label;$('#assistantTitle').textContent=flow().title;$('#chat').innerHTML='';bubble('assistant',flow().hello);render()}$$('#modeTabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));$$('[data-example]').forEach(b=>b.onclick=()=>{$('#message').value=b.dataset.example;render()});$('#message').addEventListener('input',render);$('#form').onsubmit=e=>{e.preventDefault();const msg=$('#message').value.trim();if(!msg)return;last=summary();last.message=msg;bubble('user',msg);const r=reply();bubble('assistant',r);speak(r);$('#message').value='';render()};
+function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}$('#json').onclick=()=>download('intake-summary.json',JSON.stringify(summary(),null,2),'application/json');$('#txt').onclick=()=>download('intake-summary.txt',Object.entries(summary()).map(([k,v])=>`${k}: ${v}`).join('\n'),'text/plain');
+if(rec){$('#voiceStatus').textContent='Ready';rec.lang='en-IN';rec.interimResults=true;rec.onstart=()=>{$('#mic').classList.add('recording');$('#mic').textContent='Stop'};rec.onend=()=>{$('#mic').classList.remove('recording');$('#mic').textContent='Mic'};rec.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;$('#message').value=t.trim();render()};$('#mic').onclick=()=>$('#mic').classList.contains('recording')?rec.stop():rec.start()}else{$('#voiceStatus').textContent='Text only';$('#mic').disabled=true}setMode('clinic');
 </script>
 </body>
 </html>
